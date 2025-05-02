@@ -25,22 +25,49 @@ const url = require('url');
 ////////////
 //Server
 
+const temp_overview = fs.readFileSync(`${__dirname}/templates/overview.html`, 'utf-8');
+const temp_product = fs.readFileSync(`${__dirname}/templates/template-product.html`, 'utf-8');
+const temp_card = fs.readFileSync(`${__dirname}/templates/template-card.html`, 'utf-8');
+
+
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
+const productData = JSON.parse(data);
+
 const server = http.createServer((req, res)=>{
     
     const pathName = req.url;
-    if(pathName == '/')
+
+    // Overview Page
+    if(pathName == '/' || pathName === '/overview')
     {
         res.writeHead(200, {
             'Content-type': 'text/html'
         });
-        res.end("<h1>Overview Page</h1>");
+
+        const product_cards = productData.map(el => {
+            return replaceTemplate(temp_card, el);
+        });
+
+
+        res.end(temp_overview);
     }
+
+    // Products Page
     else if(pathName == '/products')
     {
         res.writeHead(200, {
             'Content-type': 'text/html'
         });
         res.end("<h1>Product Page</h1>");
+    }
+
+    // API
+    else if(pathName === '/api')
+    {
+        res.writeHead(200, {
+            'Content-type': 'application/json'
+        });
+        res.end(data);
     }
     else
     {
